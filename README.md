@@ -1,5 +1,5 @@
 # release-note
-Release note for IPM2 and related products
+Repository to manage release note for IPM2 and related products
 
 ## Content
 
@@ -33,9 +33,9 @@ Commit the new file in a branch corresponding of the new version of the product 
 The CI process need a JSON file for generating release note into product package.
 This tool is used to generated this JSON file.
 
-From within the source tree, run the script without parameter to generate internal release note:
+From within the source tree, run the script with input parameters as following to generate internal release note:
 ```bash
-./convert.sh <INPUT_DIR> <OUTPUT_FILE>
+./tools/convert.sh <INPUT_DIR> <OUTPUT_FILE>
 
 with INPUT_FILE: Input directory which contains release note files (*.md)
      OUTPUT_FILE: Output release note file (json)
@@ -55,6 +55,3 @@ It is a JSON file and must have this format (e.g for IPM with two release note f
 	}
 ]
 ```
-
-
-
