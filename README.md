@@ -31,7 +31,7 @@ with \<product\> = Name of the product (e.g "ipm") \
 ## Advanced mode: Generation of internal release note (json format)
 
 The CI process need a JSON file for generating release note into product package. \
-This tool is used to generated this JSON file. \
+This tool is used to generated this JSON file.
 
 From within the source tree, run the script with input parameters as following to generate internal release note:
 ```bash
