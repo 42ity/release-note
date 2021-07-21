@@ -16,11 +16,11 @@ EOF
 #[
 #	{
 #		"version": "2.3.0",
-#		"content": "<content of release note (markdown format) without carriage return(replace with <cr>)>"
+#		"content": "<content of release note (markdown format) without carriage return(replace with \n)>"
 #	},
 #	{
 #		"version": "2.2.0",
-#		"content": "<content of release note (markdown format) without carriage return(replace with <cr>)>"
+#		"content": "<content of release note (markdown format) without carriage return(replace with \n)>"
 #	}
 #]
 convert_md_to_json() {
@@ -42,9 +42,11 @@ convert_md_to_json() {
         echo "${version}\"," >> "$output_file"
         echo -n $'\t\t"content": "' >> "$output_file"
 
-        # Reading each line and convert CR with "<CR>"
+        # Reading each line and convert CR with "\n"
         while read line; do
-            echo -n "$line<cr>" >> "$output_file"
+            # Escape '"'
+            line=$(echo "$line" | sed -e 's/[\"]/\\&/g')
+            echo -n "$line\n" >> "$output_file"
         done < "${file}.md"
         echo -n $'"\n\t}' >> "$output_file"
         n=$((n+1))
