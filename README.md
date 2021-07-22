@@ -37,8 +37,8 @@ From within the source tree, run the script with input parameters as following t
 ```bash
 ./tools/convert.sh <INPUT_DIR> <OUTPUT_FILE>
 
-with INPUT_FILE: Input directory which contains release note files (*.md)
-     OUTPUT_FILE: Output release note file (json)
+with INPUT_DIR: Input directory which contains release note files (*.md)
+     OUTPUT_FILE: Output release note file generated (json)
 ```
 
 Check the generated internal release note (json file). \
