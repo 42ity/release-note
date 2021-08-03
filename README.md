@@ -47,11 +47,11 @@ It is a JSON file and must have this format (e.g for IPM with two release note f
 [
 	{
 		"version": "2.3.0",
-		"content": "<content of release note (2.3.0.md) without carriage return(replace with \n)>"
+		"content": "<content of release note (2.3.0.md) without carriage return(replace with \\n)>"
 	},
 	{
 		"version": "2.2.0",
-		"content": "<content of release note (2.2.0.md) without carriage return (replace with \n)>"
+		"content": "<content of release note (2.2.0.md) without carriage return (replace with \\n)>"
 	}
 ]
 ```
