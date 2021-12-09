@@ -35,13 +35,19 @@ pipeline {
 
         stage ('check-spelling') {
             steps {
-                sh """
+                script {
+                    def ret = sh (returnStatus:true, script:"""
 if ( command -v aspell) ; then
     make clean spellcheck
 else
     echo "SKIPPED SPELLCHECK (no tools found)"
+    exit 42
 fi
-"""
+""")
+                    if (ret == 42) {
+                        unstable "SKIPPED SPELLCHECK"
+                    }
+                }
             }
         }
     }
