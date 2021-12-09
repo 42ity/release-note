@@ -3,6 +3,7 @@
 OUTFILE = latest.json
 PRODUCT = ipm
 CONVERT = ./tools/convert.sh
+JSONSH = ./JSON.sh/JSON.sh
 INPUTS = $(shell ls -1 "$(PRODUCT)"/*.md)
 
 EGREP = grep -E
@@ -15,20 +16,28 @@ ASPELL_OUT_NOTERRORS = (^[ \t]*[\*\@]|^$$)
 
 all: $(OUTFILE)
 
-check: spellcheck
+check: spellcheck check-json
 
 clean:
-	rm -f $(OUTFILE) $(addsuffix .spellchecked, $(INPUTS))
+	rm -f $(OUTFILE) $(addsuffix .spellchecked, $(INPUTS)) $(OUTFILE).checkedvalid
 	# Interactive aspell leaves older copies of checked files; with Git we do not need them:
 	rm -f $(addsuffix .bak, $(INPUTS))
 
 $(OUTFILE): $(INPUTS)
 	$(CONVERT) "$(PRODUCT)" "$(OUTFILE)"
 
+check-json: $(OUTFILE).checkedvalid
+
+$(OUTFILE).checkedvalid: $(OUTFILE)
+	rm -f "$@"
+	$(JSONSH) -N -P < "$<" >/dev/null && echo " JSON-OK    $<" >&2 || { echo " JSON-FAIL  $<" >&2 ; exit 1; }
+	touch "$@"
+
 spellcheck: $(addsuffix .spellchecked, $(INPUTS))
 
 # Ported from NUT
 %.spellchecked: %
+	@rm -f "$@"
 	@test -s "$<"
 	@echo "  SPELLCHECK  $<" ; \
 	 OUT="`(sed 's,^\(.*\)$$, \1,' | \
