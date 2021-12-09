@@ -23,15 +23,34 @@ pipeline {
 
     options {
         disableConcurrentBuilds()
+        skipDefaultCheckout()
     }
 
     stages {
 
-        stage ('ensure git submodules') {
-            // else fallback to JSON.sh in PATH on the build agent
+        stage ('git') {
             steps {
-                // TODO: Is it cleaner via checkout step?
-                sh """ git submodule init && git submodule update || true """
+                retry(3) {
+                    //checkout scm
+
+                    // We need to ensure submodules are here...
+                    // or fallback to using agent provided JSON.sh if any
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "${env.GIT_COMMIT}"]],
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [[
+                            $class: 'SubmoduleOption',
+                            disableSubmodules: false,
+                            parentCredentials: true,
+                            recursiveSubmodules: true,
+                            reference: '',
+                            trackingSubmodules: false
+                        ]],
+                        submoduleCfg: [],
+                        userRemoteConfigs: scm.userRemoteConfigs
+                        ])
+                }
             }
         }
 
