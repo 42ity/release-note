@@ -3,6 +3,9 @@
 SCRIPT_DIR="`dirname "$0"`"
 SCRIPT_DIR="`cd "$SCRIPT_DIR" && pwd`"
 
+PATH="$SCRIPT_DIR/../JSON.sh:$PATH"
+export PATH
+
 usage() {
 cat << EOF
 #   Usage: convert.sh <INPUT_DIR> <OUTPUT_FILE>
@@ -46,7 +49,7 @@ convert_md_to_json() {
         echo -n $'\t\t"content": "' >> "$output_file"
 
         # Read each line and convert CR with "\n"
-        "$SCRIPT_DIR/../JSON.sh/JSON.sh" -Q < "${file}.md" >> "$output_file"
+        JSON.sh -Q < "${file}.md" >> "$output_file"
         # Add literal "\n" at end of converted text, before the closing quote"
         echo -n '\\' >> "$output_file"
         echo -n 'n' >> "$output_file"
