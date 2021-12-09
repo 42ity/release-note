@@ -30,7 +30,7 @@ with \<product\> = Name of the product (e.g "ipm") \
 
 ## Advanced mode: Generation of internal release note (json format)
 
-The CI process need a JSON file for generating release note into product package. \
+The CI process needs a JSON file for generating release note into product package. \
 This tool is used to generated this JSON file.
 
 From within the source tree, run the script with input parameters as following to generate internal release note:
@@ -41,17 +41,19 @@ with INPUT_DIR: Input directory which contains release note files (*.md)
      OUTPUT_FILE: Output release note file generated (json)
 ```
 
-Check the generated internal release note (json file). \
+Check the generated internal release note (JSON file). \
 It is a JSON file and must have this format (e.g for IPM with two release note files "2.3.0.md" and "2.2.0.md"):
 ```bash
 [
 	{
 		"version": "2.3.0",
-		"content": "<content of release note (2.3.0.md) without carriage return(replace with \\n)>"
+		"content": "<content of release note (2.3.0.md) without carriage return (replaced with \\n)>\\n"
 	},
 	{
 		"version": "2.2.0",
-		"content": "<content of release note (2.2.0.md) without carriage return (replace with \\n)>"
+		"content": "<content of release note (2.2.0.md) without carriage return (replaced with \\n)>\\n"
 	}
 ]
 ```
+
+This section would be used to publish the released image.
