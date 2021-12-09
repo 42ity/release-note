@@ -17,13 +17,19 @@ pipeline {
     stages {
         stage ('check-json-generation') {
             steps {
-                sh """ make check-json """
+                sh """ make clean check-json """
             }
         }
 
         stage ('check-spelling') {
             steps {
-                sh """ make spellcheck """
+                sh """
+if ( command -v aspell) ; then
+    make clean spellcheck
+else
+    echo "SKIPPED SPELLCHECK (no tools found)"
+fi
+"""
             }
         }
     }
