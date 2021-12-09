@@ -18,6 +18,7 @@ pipeline {
         stage ('check-json-generation') {
             steps {
                 sh """ make clean check-json """
+                archiveArtifacts(artifacts: 'latest.json', allowEmptyArchive: false)
             }
         }
 
