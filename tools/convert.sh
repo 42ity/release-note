@@ -6,6 +6,11 @@ SCRIPT_DIR="`cd "$SCRIPT_DIR" && pwd`"
 PATH="$SCRIPT_DIR/../JSON.sh:$PATH"
 export PATH
 
+LC_ALL=C
+LC_LANG=C
+TZ=UTC
+export LC_ALL LC_LANG TZ
+
 usage() {
 cat << EOF
 #   Usage: convert.sh <INPUT_DIR> <OUTPUT_FILE>
