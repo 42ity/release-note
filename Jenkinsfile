@@ -31,10 +31,13 @@ pipeline {
         stage ('git') {
             steps {
                 retry(3) {
-                    //checkout scm
+                    checkout scm
+                    sh """ git submodule init && git submodule update || true """
 
-                    // We need to ensure submodules are here...
-                    // or fallback to using agent provided JSON.sh if any
+/*
+                    // Ideally, we need to ensure submodules are here...
+                    // or fallback using agent-provided JSON.sh if any on PATH
+                    // But CI farm (or its connectivity) does not cooperate
                     checkout([
                         $class: 'GitSCM',
                         branches: [[name: "${env.GIT_COMMIT}"]],
@@ -50,6 +53,7 @@ pipeline {
                         submoduleCfg: [],
                         userRemoteConfigs: scm.userRemoteConfigs
                         ])
+*/
                 }
             }
         }
