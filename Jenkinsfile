@@ -26,6 +26,15 @@ pipeline {
     }
 
     stages {
+
+        stage ('ensure git submodules') {
+            // else fallback to JSON.sh in PATH on the build agent
+            steps {
+                // TODO: Is it cleaner via checkout step?
+                sh """ git submodule init && git submodule update || true """
+            }
+        }
+
         stage ('check-json-generation') {
             steps {
                 sh """ make clean check-json """
