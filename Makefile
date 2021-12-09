@@ -3,7 +3,8 @@
 OUTFILE = latest.json
 PRODUCT = ipm
 CONVERT = ./tools/convert.sh
-JSONSH = ./JSON.sh/JSON.sh
+JSONSH_PATH = ./JSON.sh/
+JSONSH = JSON.sh
 INPUTS = $(shell ls -1 "$(PRODUCT)"/*.md)
 
 EGREP = grep -E
@@ -30,7 +31,10 @@ check-json: $(OUTFILE).checkedvalid
 
 $(OUTFILE).checkedvalid: $(OUTFILE)
 	rm -f "$@"
-	$(JSONSH) -N -P < "$<" >/dev/null && echo " JSON-OK    $<" >&2 || { echo " JSON-FAIL  $<" >&2 ; exit 1; }
+	PATH="$(JSONSH_PATH):$$PATH" ; export PATH; \
+	    $(JSONSH) -N -P < "$<" >/dev/null \
+	    && echo " JSON-OK    $<" >&2 \
+	    || { echo " JSON-FAIL  $<" >&2 ; exit 1; }
 	touch "$@"
 
 spellcheck: $(addsuffix .spellchecked, $(INPUTS))
