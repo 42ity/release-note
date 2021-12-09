@@ -3,7 +3,7 @@
 SCRIPT_DIR="`dirname "$0"`"
 SCRIPT_DIR="`cd "$SCRIPT_DIR" && pwd`"
 
-PATH="$SCRIPT_DIR/../JSON.sh:$PATH"
+PATH="$SCRIPT_DIR/../JSON.sh:/usr/share/fty/scripts:$PATH"
 export PATH
 
 LC_ALL=C

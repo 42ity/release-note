@@ -31,7 +31,7 @@ check-json: $(OUTFILE).checkedvalid
 
 $(OUTFILE).checkedvalid: $(OUTFILE)
 	rm -f "$@"
-	PATH="$(JSONSH_PATH):$$PATH" ; export PATH; \
+	PATH="$(JSONSH_PATH):/usr/share/fty/scripts:$$PATH" ; export PATH; \
 	    $(JSONSH) -N -P < "$<" >/dev/null \
 	    && echo " JSON-OK    $<" >&2 \
 	    || { echo " JSON-FAIL  $<" >&2 ; exit 1; }
