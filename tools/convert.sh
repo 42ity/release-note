@@ -6,6 +6,10 @@ SCRIPT_DIR="`cd "$SCRIPT_DIR" && pwd`"
 PATH="$SCRIPT_DIR/../JSON.sh:/usr/share/fty/scripts:$PATH"
 export PATH
 
+(command -v JSON.sh) \
+&& { echo "INFO: Will use the copy of JSON.sh in the PATH found above to 'cook' text files into strings"; } \
+|| { echo "WARNING: Seems you have no JSON.sh in the PATH; is the submodule checked out?" >&2; }
+
 LC_ALL=C
 LC_LANG=C
 TZ=UTC
