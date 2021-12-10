@@ -6,6 +6,10 @@ SCRIPT_DIR="`cd "$SCRIPT_DIR" && pwd`"
 PATH="$SCRIPT_DIR/../JSON.sh:/usr/share/fty/scripts:$PATH"
 export PATH
 
+(command -v JSON.sh) \
+&& { echo "INFO: Will use the copy of JSON.sh in the PATH found above to 'cook' text files into strings"; } \
+|| { echo "WARNING: Seems you have no JSON.sh in the PATH; is the submodule checked out?" >&2; }
+
 LC_ALL=C
 LC_LANG=C
 TZ=UTC
@@ -48,17 +52,17 @@ convert_md_to_json() {
         else
             echo "" >> "$output_file"
         fi
-        echo $'\t{' >> "$output_file"
-        echo -n $'\t\t"version": "' >> "$output_file"
-        echo "${version}\"," >> "$output_file"
-        echo -n $'\t\t"content": "' >> "$output_file"
+        printf '\t{\n' >> "$output_file"
+        printf '\t\t"version": "' >> "$output_file"
+        # Assumes no chars surprising for a JSON string in the version (from filename)
+        printf "${version}\",\n" >> "$output_file"
+        printf '\t\t"content": "' >> "$output_file"
 
         # Read each line and convert CR with "\n"
         JSON.sh -Q < "${file}.md" >> "$output_file"
         # Add literal "\n" at end of converted text, before the closing quote"
-        echo -n '\\' >> "$output_file"
-        echo -n 'n' >> "$output_file"
-        echo -n $'"\n\t}' >> "$output_file"
+        printf '%s%s' '\' 'n'  >> "$output_file"
+        printf '"\n\t}' >> "$output_file"
         n=$((n+1))
     done
     if [[ ! "$n" -eq 0 ]]; then
