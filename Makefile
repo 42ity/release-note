@@ -19,8 +19,11 @@ all: $(OUTFILE)
 
 check: spellcheck check-json
 
-clean:
-	rm -f $(OUTFILE) $(addsuffix .spellchecked, $(INPUTS)) $(OUTFILE).checkedvalid
+clean-checked:
+	rm -f $(addsuffix .spellchecked, $(INPUTS)) $(OUTFILE).checkedvalid
+
+clean: clean-checked
+	rm -f $(OUTFILE)
 	# Interactive aspell leaves older copies of checked files; with Git we do not need them:
 	rm -f $(addsuffix .bak, $(INPUTS))
 
