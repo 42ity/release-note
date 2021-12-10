@@ -35,6 +35,9 @@ check-json: $(OUTFILE).checkedvalid
 $(OUTFILE).checkedvalid: $(OUTFILE)
 	@rm -f "$@"
 	@PATH="$(JSONSH_PATH):/usr/share/fty/scripts:$$PATH" ; export PATH; \
+	    command -v JSON.sh \
+	    && { echo "INFO: Will use the copy of JSON.sh in the PATH found above to check '$<' file structure"; } \
+	    || { echo "WARNING: Seems you have no JSON.sh in the PATH; is the submodule checked out?" >&2; } ; \
 	    $(JSONSH) -N -P < "$<" >/dev/null \
 	    && echo " JSON-OK    $<" >&2 \
 	    || { echo " JSON-FAIL  $<" >&2 ; exit 1; }
