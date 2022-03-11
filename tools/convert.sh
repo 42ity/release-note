@@ -17,10 +17,11 @@ export LC_ALL LC_LANG TZ
 
 usage() {
 cat << EOF
-#   Usage: convert.sh <INPUT_DIR> <OUTPUT_FILE>
+#   Usage: convert.sh <INPUT_DIR> <output_file_JSON> [output_file_PDF]
 #
 #   with INPUT_FILE: Input directory which contains release note files (*.md)
-#        OUTPUT_FILE: Output release note file (json)
+#        output_file_JSON: Output release note file (JSON format)
+#        output_file_PDF: Output release note file (cumulative PDF format)
 EOF
 }
 
@@ -40,7 +41,8 @@ EOF
 #]
 convert_md_to_json() {
     n=0
-    echo -n "[" > "$output_file"
+    echo "JSON file generation"
+    echo -n "[" > "$output_file_json"
     # for each file in directory (revert sort with file name without extension)
     # caution: 2.3.0-1 must be prior to 2.3.0
     for file in `ls -1 "$input_dir"/*.md | rev | cut -d . -f 2- | rev | sort -r`
@@ -48,27 +50,52 @@ convert_md_to_json() {
         version="$(basename "$file")"
         echo "Find $version ($file)"
         if [[ ! "$n" -eq 0 ]]; then
-            echo "," >> "$output_file"
+            echo "," >> "$output_file_json"
         else
-            echo "" >> "$output_file"
+            echo "" >> "$output_file_json"
         fi
-        printf '\t{\n' >> "$output_file"
-        printf '\t\t"version": "' >> "$output_file"
+        printf '\t{\n' >> "$output_file_json"
+        printf '\t\t"version": "' >> "$output_file_json"
         # Assumes no chars surprising for a JSON string in the version (from filename)
-        printf "${version}\",\n" >> "$output_file"
-        printf '\t\t"content": "' >> "$output_file"
+        printf "${version}\",\n" >> "$output_file_json"
+        printf '\t\t"content": "' >> "$output_file_json"
 
         # Read each line and convert CR with "\n"
-        JSON.sh -Q < "${file}.md" >> "$output_file"
+        JSON.sh -Q < "${file}.md" >> "$output_file_json"
         # Add literal "\n" at end of converted text, before the closing quote"
-        printf '%s%s' '\' 'n'  >> "$output_file"
-        printf '"\n\t}' >> "$output_file"
+        printf '%s%s' '\' 'n'  >> "$output_file_json"
+        printf '"\n\t}' >> "$output_file_json"
         n=$((n+1))
     done
     if [[ ! "$n" -eq 0 ]]; then
-        echo "" >> "$output_file"
+        echo "" >> "$output_file_json"
     fi
-    echo -n $']\n' >> "$output_file"
+    echo -n $']\n' >> "$output_file_json"
+}
+
+
+convert_md_to_pdf() {
+    rm -f ipm.md
+    echo "PDF file generation"
+    which pandoc 1>/dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        echo "pandoc is not available. Aborting PDF generation"
+        exit 1
+    fi
+
+    # for each file in directory (revert sort with file name without extension)
+    # caution: 2.3.0-1 must be prior to 2.3.0
+    for file in `ls -1 "$input_dir"/*.md | rev | cut -d . -f 2- | rev | sort -r`
+    do
+        version="$(basename "$file")"
+        echo "Find $version ($file)"
+        cat $file.md >> ipm.md
+        # Insert separator between entries
+        echo -e "\n  * * *\n" >> ipm.md
+    done
+    # Generate the PDF file
+    pandoc ipm.md -s -o $output_file_pdf --variable mainfont="Carlito" -V geometry:margin=1in
+    rm -f ipm.md
 }
 
 if [ $# -lt 2 ]; then
@@ -77,10 +104,19 @@ if [ $# -lt 2 ]; then
     exit 1
 else
     input_dir="$1"
-    output_file="$2"
+    output_file_json="$2"
+    if [ $# -eq 3 ]; then
+        output_file_pdf="$3"
+    else
+        output_file_pdf=""
+    fi
     echo input_dir="$input_dir"
-    echo output_file="$output_file"
+    echo output_file_json="$output_file_json"
+    echo output_file_pdf="$output_file_pdf"
 
     convert_md_to_json
+    if [ -n "$output_file_pdf" ]; then
+        convert_md_to_pdf
+    fi
 fi
 
