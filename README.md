@@ -16,7 +16,7 @@ The format of release note file is markdown.
 with \<product\> = Name of the product (e.g "ipm") \
      \<version\> = Version of the product (e.g "2.3.0")
 * Use the markdown preview in github to check the modifications.
-* When is good, commit the file modified in a branch corresponding of the version of the product (e.g "release/IPM-2.3.0").
+* When is good, commit the file modified in the master branch.
 
 ## How to generate a new release note
 
@@ -26,7 +26,7 @@ with \<product\> = Name of the product (e.g "ipm") \
 * Edit the new file and make directly modifications inside file.
 * You can copy the content of a previous version to have the correct format.
 * Use the markdown preview in github to check the modifications.
-* Commit the new file in a branch corresponding of the new version of the product (e.g "release/IPM-2.3.0").
+* Commit the new file in the master branch.
 
 ## Advanced mode: Generation of internal release note (json format)
 
@@ -34,16 +34,20 @@ The CI process needs a JSON file for generating release note into product packag
 This tool is used to generated this JSON file.
 
 From within the source tree, run the script with input parameters as following to generate internal release note:
-```bash
-./tools/convert.sh <INPUT_DIR> <OUTPUT_FILE>
+```
+./tools/convert.sh <CURRENT_VERSION> <INPUT_DIR> <output_file_JSON> [<output_file_PDF/TXT>]
 
-with INPUT_DIR: Input directory which contains release note files (*.md)
-     OUTPUT_FILE: Output release note file generated (json)
+with CURRENT_VERSION: Current version for release note (e.g "2.6.0-1").
+                      Could be empty to have all versions available.
+     INPUT_FILE: Input directory which contains release note files (*.md)
+     output_file_JSON: Output release note file (JSON format)
+     output_file_PDF/TXT: Output release note file (cumulative PDF and TEXT format)
+                          which can either be "file.pdf" or "file"
 ```
 
 Check the generated internal release note (JSON file). \
 It is a JSON file and must have this format (e.g for IPM with two release note files "2.3.0.md" and "2.2.0.md"):
-```bash
+```json
 [
 	{
 		"version": "2.3.0",
