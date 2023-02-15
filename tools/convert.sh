@@ -3,6 +3,8 @@
 SCRIPT_DIR="`dirname "$0"`"
 SCRIPT_DIR="`cd "$SCRIPT_DIR" && pwd`"
 
+NB_MAX_RELEASE=20  # Number max of release note to display
+
 PATH="$SCRIPT_DIR/../JSON.sh:/usr/share/fty/scripts:$PATH"
 export PATH
 
@@ -17,9 +19,11 @@ export LC_ALL LC_LANG TZ
 
 usage() {
 cat << EOF
-#   Usage: convert.sh <INPUT_DIR> <output_file_JSON> [output_file_PDF/TXT]
+#   Usage: convert.sh <CURRENT_VERSION> <INPUT_DIR> <output_file_JSON> [<output_file_PDF/TXT>]
 #
-#   with INPUT_FILE: Input directory which contains release note files (*.md)
+#   with CURRENT_VERSION: Current version for release note (e.g "2.6.0-1").
+#                         Could be empty to have all versions available.
+#        INPUT_FILE: Input directory which contains release note files (*.md)
 #        output_file_JSON: Output release note file (JSON format)
 #        output_file_PDF/TXT: Output release note file (cumulative PDF and TEXT format)
 #                             which can either be "file.pdf" or "file"
@@ -28,6 +32,8 @@ EOF
 
 # Put in a output json file each markdown file content present in the input directory
 # sort with name in reverse alphabetical order.
+# If current version is defined, take into account only release note with version inferior or equal to
+# this version.
 # Note: version is the name of the markdown file without extension (same key use for sorting)
 # json format file:
 #[
@@ -50,22 +56,31 @@ convert_md_to_json() {
     do
         version="$(basename "$file")"
         echo "Find $version ($file)"
-        if [[ ! "$n" -eq 0 ]]; then
-            echo "," >> "$output_file_json"
-        else
-            echo "" >> "$output_file_json"
-        fi
-        printf '\t{\n' >> "$output_file_json"
-        printf '\t\t"version": "' >> "$output_file_json"
-        # Assumes no chars surprising for a JSON string in the version (from filename)
-        printf "${version}\",\n" >> "$output_file_json"
-        printf '\t\t"content": "' >> "$output_file_json"
 
-        # Read each line and convert CR with "\n"
-        JSON.sh -Q < "${file}.md" >> "$output_file_json"
-        # Add literal "\n" at end of converted text, before the closing quote"
-        printf '%s%s' '\' 'n'  >> "$output_file_json"
-        printf '"\n\t}' >> "$output_file_json"
+        # check nb max release note reported in file
+        if [[ "$n" -le "$NB_MAX_RELEASE" ]]; then
+
+            # add release note if version inferior or equal to current version (if defined)   
+            if [ -z "$current_version" ] || [[ ! "$version" > "$current_version" ]]; then
+
+                if [[ ! "$n" -eq 0 ]]; then
+                    echo "," >> "$output_file_json"
+                else
+                    echo "" >> "$output_file_json"
+                fi
+                printf '\t{\n' >> "$output_file_json"
+                printf '\t\t"version": "' >> "$output_file_json"
+                # Assumes no chars surprising for a JSON string in the version (from filename)
+                printf "${version}\",\n" >> "$output_file_json"
+                printf '\t\t"content": "' >> "$output_file_json"
+
+                # Read each line and convert CR with "\n"
+                JSON.sh -Q < "${file}.md" >> "$output_file_json"
+                # Add literal "\n" at end of converted text, before the closing quote"
+                printf '%s%s' '\' 'n'  >> "$output_file_json"
+                printf '"\n\t}' >> "$output_file_json"
+            fi
+        fi
         n=$((n+1))
     done
     if [[ ! "$n" -eq 0 ]]; then
@@ -115,18 +130,20 @@ convert_md_to_pdf_and_text() {
     rm -f ipm.md
 }
 
-if [ $# -lt 2 ]; then
+if [ $# -lt 3 ]; then
     echo "Bad parameters"
     usage
     exit 1
 else
-    input_dir="$1"
-    output_file_json="$2"
-    if [ $# -eq 3 ]; then
-        output_file_pdf="$3"
+    current_version="$1"
+    input_dir="$2"
+    output_file_json="$3"
+    if [ $# -eq 4 ]; then
+        output_file_pdf="$4"
     else
         output_file_pdf=""
     fi
+    echo current_version="$current_version"
     echo input_dir="$input_dir"
     echo output_file_json="$output_file_json"
     echo output_file_pdf="$output_file_pdf"
