@@ -79,9 +79,10 @@ convert_md_to_json() {
                 # Add literal "\n" at end of converted text, before the closing quote"
                 printf '%s%s' '\' 'n'  >> "$output_file_json"
                 printf '"\n\t}' >> "$output_file_json"
+
+                n=$((n+1))
             fi
         fi
-        n=$((n+1))
     done
     if [[ ! "$n" -eq 0 ]]; then
         echo "" >> "$output_file_json"
