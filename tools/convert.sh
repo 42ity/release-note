@@ -117,9 +117,17 @@ convert_md_to_pdf_and_text() {
     do
         version="$(basename "$file")"
         echo "Find $version ($file)"
-        cat $file.md >> ipm.md
-        # Insert separator between entries
-        echo -e "\n  * * *\n" >> ipm.md
+
+        # check nb max release note reported in file
+        if [[ "$n" -le "$NB_MAX_RELEASE" ]]; then
+
+            # add release note if version inferior or equal to current version (if defined)
+            if [ -z "$current_version" ] || [[ ! "$version" > "$current_version" ]]; then
+                cat $file.md >> ipm.md
+                # Insert separator between entries
+                echo -e "\n  * * *\n" >> ipm.md
+            fi
+        fi
     done
     # Generate the PDF file
     pandoc ipm.md -s -o $output_file_pdf --variable mainfont="Carlito" -V geometry:margin=1in
