@@ -58,9 +58,9 @@ convert_md_to_json() {
         echo "Find $version ($file)"
 
         # check nb max release note reported in file
-        if [[ "$n" -le "$NB_MAX_RELEASE" ]]; then
+        if [[ "$n" -lt "$NB_MAX_RELEASE" ]]; then
 
-            # add release note if version inferior or equal to current version (if defined)   
+            # add release note if version inferior or equal to current version (if defined)
             if [ -z "$current_version" ] || [[ ! "$version" > "$current_version" ]]; then
 
                 if [[ ! "$n" -eq 0 ]]; then
@@ -92,6 +92,7 @@ convert_md_to_json() {
 
 
 convert_md_to_pdf_and_text() {
+    n=0
     rm -f ipm.md
     echo "PDF and TEXT files generation"
     which pandoc 1>/dev/null 2>&1
@@ -119,13 +120,17 @@ convert_md_to_pdf_and_text() {
         echo "Find $version ($file)"
 
         # check nb max release note reported in file
-        if [[ "$n" -le "$NB_MAX_RELEASE" ]]; then
+        if [[ "$n" -lt "$NB_MAX_RELEASE" ]]; then
 
             # add release note if version inferior or equal to current version (if defined)
             if [ -z "$current_version" ] || [[ ! "$version" > "$current_version" ]]; then
                 cat $file.md >> ipm.md
                 # Insert separator between entries
-                echo -e "\n  * * *\n" >> ipm.md
+                echo -e "\n" >> ipm.md
+                echo -e "* * *" >> ipm.md
+                echo -e "\n" >> ipm.md
+
+                n=$((n+1))
             fi
         fi
     done
