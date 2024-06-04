@@ -3,11 +3,6 @@
 pipeline {
     // This job only does a spell-check so far, needs "aspell" in PATH
     // but does no pushing, coverage or other time-consuming tasks
-/*
-    agent {
-        label infra.getAgentLabels()
-    }
-*/
 
     agent {
         docker {
@@ -31,29 +26,16 @@ pipeline {
         stage ('git') {
             steps {
                 retry(3) {
-                    checkout scm
-                    sh """ git submodule init && git submodule update || true """
-
-/*
-                    // Ideally, we need to ensure submodules are here...
-                    // or fallback using agent-provided JSON.sh if any on PATH
-                    // But CI farm (or its connectivity) does not cooperate
-                    checkout([
+                      checkout([
                         $class: 'GitSCM',
-                        branches: [[name: "${env.GIT_COMMIT}"]],
-                        doGenerateSubmoduleConfigurations: false,
-                        extensions: [[
-                            $class: 'SubmoduleOption',
-                            disableSubmodules: false,
-                            parentCredentials: true,
-                            recursiveSubmodules: true,
-                            reference: '',
-                            trackingSubmodules: false
-                        ]],
-                        submoduleCfg: [],
+                        branches: scm.branches,
+                        extensions: scm.extensions + [
+                            [$class: 'CloneOption', noTags: true],
+                            [$class: 'SubmoduleOption', recursiveSubmodules: true, parentCredentials: true]
+                        ],
                         userRemoteConfigs: scm.userRemoteConfigs
-                        ])
-*/
+                    ])
+
                 }
             }
         }
@@ -69,13 +51,13 @@ pipeline {
             steps {
                 script {
                     def ret = sh (returnStatus:true, script:"""
-if ( command -v aspell) ; then
-    make clean spellcheck
-else
-    echo "SKIPPED SPELLCHECK (no tools found)"
-    exit 42
-fi
-""")
+                        if ( command -v aspell) ; then
+                            make clean spellcheck
+                        else
+                            echo "SKIPPED SPELLCHECK (no tools found)"
+                            exit 42
+                        fi
+                        """)
                     if (ret == 42) {
                         unstable "SKIPPED SPELLCHECK"
                     }
