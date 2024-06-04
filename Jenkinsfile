@@ -8,7 +8,7 @@ pipeline {
         docker {
             label 'docker-dev-1'
             image infra.getDockerAgentImage()
-            args '--oom-score-adj=100 -v /opt/cov:/opt/cov:ro --security-opt seccomp=unconfined '
+            args '--oom-score-adj=100 --security-opt seccomp=unconfined'
         }
     }
 
@@ -22,11 +22,10 @@ pipeline {
     }
 
     stages {
-
         stage ('git') {
             steps {
                 retry(3) {
-                      checkout([
+                    checkout([
                         $class: 'GitSCM',
                         branches: scm.branches,
                         extensions: scm.extensions + [
@@ -35,7 +34,6 @@ pipeline {
                         ],
                         userRemoteConfigs: scm.userRemoteConfigs
                     ])
-
                 }
             }
         }
