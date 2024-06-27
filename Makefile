@@ -6,6 +6,7 @@ CONVERT = ./tools/convert.sh
 JSONSH_PATH = ./JSON.sh/
 JSONSH = JSON.sh
 INPUTS = $(shell ls -1 "$(PRODUCT)"/*.md)
+CURRENT_VERSION= ""
 
 EGREP = grep -E
 ASPELL = aspell
@@ -28,7 +29,7 @@ clean: clean-checked
 	rm -f $(addsuffix .bak, $(INPUTS))
 
 $(OUTFILE): $(INPUTS)
-	$(CONVERT) "$(PRODUCT)" "$(OUTFILE)"
+	$(CONVERT) "$(CURRENT_VERSION)" "$(PRODUCT)" "$(OUTFILE)"
 
 check-json: $(OUTFILE).checkedvalid
 
