@@ -3,7 +3,7 @@
 SCRIPT_DIR="`dirname "$0"`"
 SCRIPT_DIR="`cd "$SCRIPT_DIR" && pwd`"
 
-NB_MAX_RELEASE=20  # Number max of release note to display
+NB_MAX_RELEASE=100  # NO-LIMIT   Number max of release note to display
 
 PATH="$SCRIPT_DIR/../JSON.sh:/usr/share/fty/scripts:$PATH"
 export PATH
@@ -122,8 +122,8 @@ convert_md_to_pdf_and_text() {
         # check nb max release note reported in file
         if [[ "$n" -lt "$NB_MAX_RELEASE" ]]; then
 
-            # add release note if version inferior or equal to current version (if defined)
-            if [ -z "$current_version" ] || [[ ! "$version" > "$current_version" ]]; then
+            # add release note if version is greater than currentversion (if defined)
+            if [ -z "$current_version" ] || [[ "$current_version" < "$version" ]]; then
                 cat $file.md >> ipm.md
                 # Insert separator between entries
                 echo -e "\n" >> ipm.md
